@@ -1,18 +1,13 @@
 import logging
-from pathlib import Path
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routers import qa, email
+from api.routers import qa
+from mcp_server import create_mcp_app
 
 logging.basicConfig(level=logging.INFO)
 
-BASE_DIR = Path(__file__).parent.parent.parent
-STATIC_DIR = BASE_DIR / "static"
-
-app = FastAPI(title="사내 AI 어시스턴트")
+app = FastAPI(title="사내 지식 베이스")
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,11 +17,4 @@ app.add_middleware(
 )
 
 app.include_router(qa.router, prefix="/api")
-app.include_router(email.router, prefix="/api")
-
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-
-
-@app.get("/")
-async def root():
-    return FileResponse(STATIC_DIR / "index.html")
+app.mount("/mcp", create_mcp_app())

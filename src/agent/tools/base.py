@@ -75,6 +75,21 @@ class VectorSearchTool(BaseTool):
         config: Optional[RunnableConfig] = None,
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ):
+        user_roles = (config or {}).get("configurable", {}).get("user_roles", ["all"])
+
+        acl_filter = models.Filter(
+            should=[
+                models.FieldCondition(
+                    key="allowed_roles",
+                    match=models.MatchAny(any=user_roles),
+                ),
+                models.FieldCondition(
+                    key="allowed_roles",
+                    match=models.MatchValue(value="all"),
+                ),
+            ]
+        )
+
         dense_vector = await self.dense_model.aembed_query(query)
         sparse_vector = next(self.sparse_model.query_embed(query))
 
@@ -85,6 +100,7 @@ class VectorSearchTool(BaseTool):
                 models.Prefetch(query=dense_vector, using="dense", limit=top_k * 2),
                 models.Prefetch(query=sparse_vector.as_object(), using="sparse", limit=top_k * 2),
             ],
+            query_filter=acl_filter,
             limit=top_k,
         )
 

@@ -41,6 +41,7 @@ async def upload(reader, reset: bool = False):
             "title": doc.get("title", ""),
             "source": doc["source"],
             "file_type": doc["file_type"],
+            "allowed_roles": doc.get("allowed_roles", ["all"]),
         })
         all_chunks.extend(chunks)
 
@@ -53,10 +54,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", choices=["notion", "confluence", "onedrive"], required=True)
     parser.add_argument("--reset", action="store_true", help="기존 컬렉션 초기화 후 재적재")
+    parser.add_argument("--roles", default="all", help="접근 허용 역할 (쉼표 구분, 예: hr,manager)")
     args = parser.parse_args()
 
+    allowed_roles = [r.strip() for r in args.roles.split(",") if r.strip()]
     readers = {"notion": NotionReader, "confluence": ConfluenceReader, "onedrive": OneDriveReader}
-    asyncio.run(upload(readers[args.source](), reset=args.reset))
+    asyncio.run(upload(readers[args.source](allowed_roles=allowed_roles), reset=args.reset))
 
 
 if __name__ == "__main__":

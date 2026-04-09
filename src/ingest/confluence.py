@@ -5,7 +5,7 @@ from .base import BaseReader
 
 
 class ConfluenceReader(BaseReader):
-    def __init__(self, url: str = None, username: str = None, api_token: str = None, space_key: str = None):
+    def __init__(self, url: str = None, username: str = None, api_token: str = None, space_key: str = None, allowed_roles: list[str] = None):
         self.confluence = Confluence(
             url=url or os.getenv("CONFLUENCE_URL"),
             username=username or os.getenv("CONFLUENCE_USERNAME"),
@@ -13,6 +13,7 @@ class ConfluenceReader(BaseReader):
             cloud=True,
         )
         self.space_key = space_key or os.getenv("CONFLUENCE_SPACE_KEY")
+        self.allowed_roles = allowed_roles or ["all"]
 
     def load(self) -> list[dict]:
         return [self._page_to_doc(page) for page in self._fetch_all_pages()]
@@ -39,4 +40,5 @@ class ConfluenceReader(BaseReader):
             "title": page["title"],
             "source": f"confluence:{page['id']}",
             "file_type": "confluence",
+            "allowed_roles": self.allowed_roles,
         }

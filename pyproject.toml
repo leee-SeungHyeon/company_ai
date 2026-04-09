@@ -26,6 +26,8 @@ dependencies = [
     "pymupdf>=1.23.14",
     "python-docx>=1.1.0",
     "beautifulsoup4>=4.13.4",
+    # MCP
+    "mcp>=1.5.0",
     # Utils
     "python-dotenv>=1.1.1",
     "requests>=2.32.4",

@@ -4,11 +4,12 @@ from .base import BaseReader
 
 
 class NotionReader(BaseReader):
-    def __init__(self, token: str = None, database_id: str = None, page_ids: list[str] = None):
+    def __init__(self, token: str = None, database_id: str = None, page_ids: list[str] = None, allowed_roles: list[str] = None):
         self.client = Client(auth=token or os.getenv("NOTION_TOKEN"))
         self.database_id = database_id or os.getenv("NOTION_DATABASE_ID")
         raw = os.getenv("NOTION_PAGE_IDS", "")
         self.page_ids = page_ids or [p.strip() for p in raw.split(",") if p.strip()]
+        self.allowed_roles = allowed_roles or ["all"]
 
     def load(self) -> list[dict]:
         documents = []
@@ -27,6 +28,7 @@ class NotionReader(BaseReader):
             "title": self._get_title(page),
             "source": f"notion:{page_id}",
             "file_type": "notion",
+            "allowed_roles": self.allowed_roles,
         }
 
     def _fetch_database_pages(self) -> list:

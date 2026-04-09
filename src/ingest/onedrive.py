@@ -9,11 +9,12 @@ SUPPORTED = {".pdf", ".txt", ".md", ".docx"}
 
 
 class OneDriveReader(BaseReader):
-    def __init__(self, client_id: str = None, client_secret: str = None, tenant_id: str = None, folder_path: str = None):
+    def __init__(self, client_id: str = None, client_secret: str = None, tenant_id: str = None, folder_path: str = None, allowed_roles: list[str] = None):
         self.client_id = client_id or os.getenv("ONEDRIVE_CLIENT_ID")
         self.client_secret = client_secret or os.getenv("ONEDRIVE_CLIENT_SECRET")
         self.tenant_id = tenant_id or os.getenv("ONEDRIVE_TENANT_ID")
         self.folder_path = folder_path or os.getenv("ONEDRIVE_FOLDER_PATH", "/")
+        self.allowed_roles = allowed_roles or ["all"]
 
     def load(self) -> list[dict]:
         headers = {"Authorization": f"Bearer {self._get_token()}"}
@@ -29,6 +30,7 @@ class OneDriveReader(BaseReader):
                     "title": file["name"],
                     "source": f"onedrive:{file['id']}",
                     "file_type": ext.lstrip("."),
+                    "allowed_roles": self.allowed_roles,
                 })
         return documents
 

@@ -34,8 +34,10 @@ def create_agent(tools: list):
         return Command(update={"messages": [AIMessage(content=response.content)]}, goto=END)
 
     async def execute_tool_node(state, config):
+        user_roles = config["configurable"].get("user_roles", ["all"])
+        tool_config = {"configurable": {"user_roles": user_roles}}
         tasks = [
-            (tool_call, tools_by_name[tool_call["name"]].ainvoke(tool_call["args"]))
+            (tool_call, tools_by_name[tool_call["name"]].ainvoke(tool_call["args"], config=tool_config))
             for tool_call in state.messages[-1].tool_calls
         ]
         results = await asyncio.gather(*[task for _, task in tasks])

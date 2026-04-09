@@ -19,10 +19,13 @@ def _get_agent():
     )
 
 
-async def answer_question(query: str) -> str:
+async def answer_question(query: str, user_roles: list[str] = None) -> str:
     agent = _get_agent()
     result = await agent.ainvoke(
         State(messages=[HumanMessage(content=query)], execute_tool_count=0),
-        {"configurable": {"max_execute_tool_count": MAX_EXECUTE_TOOL_COUNT}},
+        {"configurable": {
+            "max_execute_tool_count": MAX_EXECUTE_TOOL_COUNT,
+            "user_roles": user_roles or ["all"],
+        }},
     )
     return result["messages"][-1].content
