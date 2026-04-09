@@ -89,16 +89,16 @@ ONEDRIVE_TENANT_ID=
 
 ```bash
 # Notion 문서 적재
-python src/ingest/upload.py --source notion
+uv run python src/ingest/upload.py --source notion
 
 # Confluence 문서 적재
-python src/ingest/upload.py --source confluence
+uv run python src/ingest/upload.py --source confluence
 
 # OneDrive 문서 적재
-python src/ingest/upload.py --source onedrive
+uv run python src/ingest/upload.py --source onedrive
 
 # 기존 데이터 초기화 후 재적재
-python src/ingest/upload.py --source notion --reset
+uv run python src/ingest/upload.py --source notion --reset
 ```
 
 ### 3. 실행
@@ -114,8 +114,8 @@ docker compose up -d
 **로컬 실행**
 
 ```bash
-pip install .
-PYTHONPATH=src uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+uv sync
+PYTHONPATH=src uv run uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ## LLM 변경
