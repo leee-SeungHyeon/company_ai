@@ -20,6 +20,7 @@ from agent.tools.doc_search import InternalDocSearchTool
 from ingest.notion import NotionReader
 from ingest.confluence import ConfluenceReader
 from ingest.onedrive import OneDriveReader
+from ingest.local import LocalReader
 from config import QDRANT_URL, DENSE_MODEL, SPARSE_MODEL
 
 load_dotenv(override=True)
@@ -52,14 +53,23 @@ async def upload(reader, reset: bool = False):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--source", choices=["notion", "confluence", "onedrive"], required=True)
+    parser.add_argument("--source", choices=["notion", "confluence", "onedrive", "local"], required=True)
+    parser.add_argument("--path", help="로컬 파일 또는 디렉토리 경로 (--source local 시 필수)")
     parser.add_argument("--reset", action="store_true", help="기존 컬렉션 초기화 후 재적재")
     parser.add_argument("--roles", default="all", help="접근 허용 역할 (쉼표 구분, 예: hr,manager)")
     args = parser.parse_args()
 
+    if args.source == "local" and not args.path:
+        parser.error("--source local 사용 시 --path 가 필요합니다.")
+
     allowed_roles = [r.strip() for r in args.roles.split(",") if r.strip()]
-    readers = {"notion": NotionReader, "confluence": ConfluenceReader, "onedrive": OneDriveReader}
-    asyncio.run(upload(readers[args.source](allowed_roles=allowed_roles), reset=args.reset))
+    readers = {
+        "notion": lambda: NotionReader(allowed_roles=allowed_roles),
+        "confluence": lambda: ConfluenceReader(allowed_roles=allowed_roles),
+        "onedrive": lambda: OneDriveReader(allowed_roles=allowed_roles),
+        "local": lambda: LocalReader(path=args.path, allowed_roles=allowed_roles),
+    }
+    asyncio.run(upload(readers[args.source](), reset=args.reset))
 
 
 if __name__ == "__main__":

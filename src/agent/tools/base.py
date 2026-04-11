@@ -7,7 +7,7 @@ from langchain_core.runnables import RunnableConfig
 from pydantic import BaseModel, Field
 from qdrant_client import AsyncQdrantClient, models
 from fastembed import SparseTextEmbedding
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from agent.llm import get_embedding_model
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class VectorSearchTool(BaseTool):
     collection_name: str
 
     def __init__(self, qdrant_url: str, dense_model_name: str, sparse_model_name: str, collection_name: str = "internal_docs"):
-        dense_model = GoogleGenerativeAIEmbeddings(model=dense_model_name)
+        dense_model = get_embedding_model()
         sparse_model = SparseTextEmbedding(model_name=sparse_model_name)
         vector_size = len(dense_model.embed_query("test"))
         super().__init__(
