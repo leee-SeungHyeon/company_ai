@@ -1,4 +1,4 @@
-from config import LLM_PROVIDER, LLM_MODEL, LLM_TEMPERATURE, DENSE_MODEL
+from config import LLM_PROVIDER, LLM_MODEL, LLM_TEMPERATURE, DENSE_MODEL, OPENAI_BASE_URL
 
 
 def get_llm():
@@ -8,7 +8,7 @@ def get_llm():
 
     if LLM_PROVIDER == "openai":
         from langchain_openai import ChatOpenAI
-        return ChatOpenAI(model=LLM_MODEL, temperature=LLM_TEMPERATURE)
+        return ChatOpenAI(model=LLM_MODEL, temperature=LLM_TEMPERATURE, base_url=OPENAI_BASE_URL)
 
     if LLM_PROVIDER == "anthropic":
         from langchain_anthropic import ChatAnthropic
@@ -24,6 +24,6 @@ def get_embedding_model():
 
     if LLM_PROVIDER in ("openai", "anthropic"):
         from langchain_openai import OpenAIEmbeddings
-        return OpenAIEmbeddings(model=DENSE_MODEL)
+        return OpenAIEmbeddings(model=DENSE_MODEL, base_url=OPENAI_BASE_URL)
 
     raise ValueError(f"지원하지 않는 LLM_PROVIDER: {LLM_PROVIDER} (gemini | openai | anthropic)")

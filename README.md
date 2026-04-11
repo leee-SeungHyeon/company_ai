@@ -82,6 +82,15 @@ OPENAI_API_KEY=your-key
 API_KEYS={"my-secret-key": ["all"], "hr-key": ["hr", "all"]}
 ```
 
+**vLLM / SGLang 온프레미스 서버 사용 시**
+
+```env
+LLM_PROVIDER=openai
+LLM_MODEL=모델명
+OPENAI_API_KEY=dummy
+OPENAI_BASE_URL=http://내부서버:8000/v1
+```
+
 ### 2. Qdrant 실행
 
 ```bash
@@ -144,6 +153,21 @@ curl -X POST http://localhost:8000/api/qa \
   "answer": "연차 휴가는 입사 1년 미만일 경우 매월 개근 시 1일씩 발생하여 최대 11일이며, 입사 1년 이상부터는 기본 15일이 발생합니다. 그리고 3년 이상 근속 시 2년마다 1일씩 추가되어 최대 25일까지 연차가 발생합니다. 연차는 최소 반일 단위로 사용할 수 있고, 사용 3일 전까지 팀장 승인이 필요합니다. (출처: 인사규정)"
 }
 ```
+
+## LLM 변경
+
+`.env`에서 `LLM_PROVIDER`와 `LLM_MODEL`만 바꾸면 됩니다.
+
+| 환경 | 설정 |
+|------|------|
+| OpenAI | `LLM_PROVIDER=openai`, `LLM_MODEL=gpt-4.1-mini` |
+| Gemini | `LLM_PROVIDER=gemini`, `LLM_MODEL=gemini-2.0-flash` |
+| Anthropic | `LLM_PROVIDER=anthropic`, `LLM_MODEL=claude-3-5-haiku-20241022` |
+| vLLM / SGLang | `LLM_PROVIDER=openai` + `OPENAI_BASE_URL=http://내부서버:8000/v1` |
+
+vLLM / SGLang은 OpenAI 호환 API를 제공하므로 `OPENAI_BASE_URL`만 내부 서버로 지정하면 코드 변경 없이 온프레미스 LLM을 사용할 수 있습니다.
+
+---
 
 ## 권한 동작 방식
 
