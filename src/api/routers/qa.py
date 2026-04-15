@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from api.auth import get_user_roles
-from services.qa import answer_question
+from services.qa import answer_question, stream_answer
 
 router = APIRouter()
 
@@ -21,3 +22,13 @@ async def qa_endpoint(request: QARequest, user_roles: list[str] = Depends(get_us
         return QAResponse(answer=answer)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/qa/stream")
+async def qa_stream_endpoint(request: QARequest, user_roles: list[str] = Depends(get_user_roles)):
+    async def generator():
+        async for chunk in stream_answer(request.query, user_roles=user_roles):
+            yield f"data: {chunk}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(generator(), media_type="text/event-stream")

@@ -2,6 +2,8 @@
 
 MCP 기반 권한관리가 도입된 RAG 용 사내 지식 베이스입니다.
 
+![screenshot](assets/screenshot.png)
+
 ## 아키텍처
 
 ```

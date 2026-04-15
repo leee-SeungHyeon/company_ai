@@ -1,5 +1,6 @@
 from functools import lru_cache
-from langchain_core.messages import HumanMessage
+from typing import AsyncGenerator
+from langchain_core.messages import HumanMessage, AIMessageChunk
 from agent import create_agent
 from agent.state import State
 from agent.tools import InternalDocSearchTool
@@ -29,3 +30,18 @@ async def answer_question(query: str, user_roles: list[str] = None) -> str:
         }},
     )
     return result["messages"][-1].content
+
+
+async def stream_answer(query: str, user_roles: list[str] = None) -> AsyncGenerator[str, None]:
+    agent = _get_agent()
+    config = {"configurable": {
+        "max_execute_tool_count": MAX_EXECUTE_TOOL_COUNT,
+        "user_roles": user_roles or ["all"],
+    }}
+    async for chunk, _ in agent.astream(
+        State(messages=[HumanMessage(content=query)], execute_tool_count=0),
+        config,
+        stream_mode="messages",
+    ):
+        if isinstance(chunk, AIMessageChunk) and chunk.content:
+            yield chunk.content
