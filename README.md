@@ -7,12 +7,13 @@ MCP 기반 권한관리가 도입된 RAG 용 사내 지식 베이스입니다.
 ## 아키텍처
 
 ```
-Claude Desktop / REST Client
+자체 챗봇 UI (Next.js)
         │  Bearer token
         ▼
 FastAPI (http://localhost:8000)
- ├── /api/qa   → REST Q&A (테스트용)
- └── /mcp      → MCP 서버 (Claude Desktop 연결)
+ ├── /api/qa        → Q&A (일반 응답)
+ ├── /api/qa/stream → Q&A (스트리밍 응답)
+ └── /mcp           → MCP 서버 (외부 MCP 클라이언트 연결용)
         │  user_roles 추출
         ▼
 LangGraph ReAct Agent
@@ -21,7 +22,7 @@ LangGraph ReAct Agent
 Qdrant (payload_filter → allowed_roles)
         │  허용된 문서만 반환
         ▼
-LLM (OpenAI / Gemini / Anthropic) → 답변 생성
+LLM (OpenAI / vLLM / SGLang) → 답변 생성
 ```
 
 ## 프로젝트 구조
@@ -33,17 +34,17 @@ company_ai/
 │   │   ├── main.py               # FastAPI 진입점
 │   │   ├── auth.py               # API Key 인증 (Bearer token → roles)
 │   │   └── routers/
-│   │       └── qa.py             # Q&A REST API
+│   │       └── qa.py             # Q&A REST API (일반 + 스트리밍)
 │   ├── agent/
 │   │   ├── graph.py              # ReAct Agent (LangGraph)
-│   │   ├── llm.py                # LLM / 임베딩 팩토리 (Gemini / OpenAI / Anthropic)
+│   │   ├── llm.py                # LLM / 임베딩 팩토리 (OpenAI / Gemini / Anthropic)
 │   │   ├── prompt.py             # 시스템 프롬프트
 │   │   ├── state.py              # Agent 상태 정의
 │   │   └── tools/
 │   │       ├── base.py           # 벡터 검색 (ACL payload_filter 포함)
 │   │       └── doc_search.py     # 사내 문서 검색 Tool
 │   ├── services/
-│   │   └── qa.py                 # Q&A 비즈니스 로직
+│   │   └── qa.py                 # Q&A 비즈니스 로직 (일반 + 스트리밍)
 │   ├── ingest/
 │   │   ├── base.py               # BaseReader 추상 클래스
 │   │   ├── local.py              # 로컬 파일 Reader (txt, md, pdf, docx)
@@ -55,10 +56,13 @@ company_ai/
 │   │   └── token.py              # 텍스트 청킹
 │   ├── mcp_server.py             # MCP 서버 (FastMCP)
 │   └── config.py                 # 환경 변수 관리
+├── frontend/                     # Next.js 챗봇 UI
 ├── docs/                         # 테스트용 사내 문서
 │   ├── 인사규정.md
 │   ├── 복리후생.md
 │   └── IT보안정책.md
+├── assets/
+│   └── screenshot.png
 ├── Dockerfile
 ├── docker-compose.yml
 └── .env.example
@@ -109,35 +113,29 @@ uv run python src/ingest/upload.py --source local --path ./docs --roles all --re
 uv run python src/ingest/upload.py --source local --path ./hr_docs --roles hr,all
 ```
 
-### 4. 서버 실행
+### 4. 백엔드 서버 실행
 
 ```bash
 PYTHONPATH=src uv run uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 5. Claude Desktop 연결 (MCP)
+### 5. 프론트엔드 실행
 
-`~/.claude/claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "company-kb": {
-      "url": "http://localhost:8000/mcp",
-      "headers": { "Authorization": "Bearer my-secret-key" }
-    }
-  }
-}
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-Claude Desktop 재시작 → `search_docs` 툴 자동 인식
+브라우저에서 `http://localhost:3000` 접속
 
 ## API
 
 | Method | Endpoint | 설명 |
 |--------|----------|------|
-| `POST` | `/api/qa` | Q&A REST API |
-| `*`    | `/mcp`    | MCP 서버 엔드포인트 |
+| `POST` | `/api/qa` | Q&A (일반 응답) |
+| `POST` | `/api/qa/stream` | Q&A (SSE 스트리밍) |
+| `*`    | `/mcp` | MCP 서버 엔드포인트 |
 
 **Q&A 요청 예시**
 
@@ -152,7 +150,7 @@ curl -X POST http://localhost:8000/api/qa \
 
 ```json
 {
-  "answer": "연차 휴가는 입사 1년 미만일 경우 매월 개근 시 1일씩 발생하여 최대 11일이며, 입사 1년 이상부터는 기본 15일이 발생합니다. 그리고 3년 이상 근속 시 2년마다 1일씩 추가되어 최대 25일까지 연차가 발생합니다. 연차는 최소 반일 단위로 사용할 수 있고, 사용 3일 전까지 팀장 승인이 필요합니다. (출처: 인사규정)"
+  "answer": "연차 휴가는 입사 1년 미만일 경우 매월 개근 시 1일씩 발생하여 최대 11일이며, 입사 1년 이상부터는 기본 15일이 발생합니다. 그리고 3년 이상 근속 시 2년마다 1일씩 추가되어 최대 25일까지 연차가 발생합니다. (출처: 인사규정)"
 }
 ```
 
