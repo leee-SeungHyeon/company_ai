@@ -20,7 +20,7 @@ Next.js UI (3000) → FastAPI (8000) → LangGraph ReAct Agent → Qdrant (6333)
 uv sync                                     # 의존성 설치
 docker compose up qdrant -d                 # Qdrant 기동 (필수)
 PYTHONPATH=src uv run uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
-uv run python src/ingest/upload.py --source local --path ./docs --roles all --reset
+uv run python src/ingest/upload.py --source local --path ./sample_data --roles all --reset
 ```
 
 ### Frontend
@@ -86,7 +86,8 @@ src/
 ├── mcp_server.py # FastMCP 서버
 └── config.py     # 환경 변수 중앙 관리
 frontend/         # Next.js 챗봇 UI
-docs/             # 테스트용 사내 문서
+docs/             # 프로젝트 레퍼런스 문서 (비어 있음, 추후 채움)
+sample_data/      # 테스트용 사내 문서 (적재 샘플)
 tests/            # pytest 스모크 테스트 (ACL 핵심 경로)
 ```
 

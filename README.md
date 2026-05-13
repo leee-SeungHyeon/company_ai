@@ -57,7 +57,8 @@ company_ai/
 │   ├── mcp_server.py             # MCP 서버 (FastMCP)
 │   └── config.py                 # 환경 변수 관리
 ├── frontend/                     # Next.js 챗봇 UI
-├── docs/                         # 테스트용 사내 문서
+├── docs/                         # 프로젝트 레퍼런스 문서 (추후 채움)
+├── sample_data/                  # 테스트용 사내 문서 (적재 샘플)
 │   ├── 인사규정.md
 │   ├── 복리후생.md
 │   └── IT보안정책.md
@@ -107,7 +108,7 @@ docker compose up qdrant -d
 
 ```bash
 # 로컬 파일 (txt, md, pdf, docx)
-uv run python src/ingest/upload.py --source local --path ./docs --roles all --reset
+uv run python src/ingest/upload.py --source local --path ./sample_data --roles all --reset
 
 # 특정 역할만 접근 가능하도록
 uv run python src/ingest/upload.py --source local --path ./hr_docs --roles hr,all
