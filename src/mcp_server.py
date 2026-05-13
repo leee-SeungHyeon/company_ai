@@ -33,7 +33,9 @@ _search_tool = InternalDocSearchTool(
 )
 
 
-@mcp.tool(description="사내 문서(규정, 가이드, 프로세스 등)를 검색합니다. 업무 규정, 사규, 프로세스 등 사내 정보를 찾을 때 사용하세요.")
+@mcp.tool(
+    description="사내 문서(규정, 가이드, 프로세스 등)를 검색합니다. 업무 규정, 사규, 프로세스 등 사내 정보를 찾을 때 사용하세요."
+)
 async def search_docs(query: str) -> list[dict]:
     user_roles = _user_roles.get()
     return await _search_tool._arun(

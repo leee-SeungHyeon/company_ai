@@ -6,6 +6,7 @@
     python src/ingest/upload.py --source confluence --reset
     python src/ingest/upload.py --source onedrive
 """
+
 import asyncio
 import argparse
 import logging
@@ -38,12 +39,15 @@ async def upload(reader, reset: bool = False):
 
     all_chunks = []
     for doc in documents:
-        chunks = chunker(doc["content"], metadata={
-            "title": doc.get("title", ""),
-            "source": doc["source"],
-            "file_type": doc["file_type"],
-            "allowed_roles": doc.get("allowed_roles", ["all"]),
-        })
+        chunks = chunker(
+            doc["content"],
+            metadata={
+                "title": doc.get("title", ""),
+                "source": doc["source"],
+                "file_type": doc["file_type"],
+                "allowed_roles": doc.get("allowed_roles", ["all"]),
+            },
+        )
         all_chunks.extend(chunks)
 
     logger.info(f"총 {len(all_chunks)}개 청크 생성")

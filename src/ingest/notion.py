@@ -4,7 +4,9 @@ from .base import BaseReader
 
 
 class NotionReader(BaseReader):
-    def __init__(self, token: str = None, database_id: str = None, page_ids: list[str] = None, allowed_roles: list[str] = None):
+    def __init__(
+        self, token: str = None, database_id: str = None, page_ids: list[str] = None, allowed_roles: list[str] = None
+    ):
         self.client = Client(auth=token or os.getenv("NOTION_TOKEN"))
         self.database_id = database_id or os.getenv("NOTION_DATABASE_ID")
         raw = os.getenv("NOTION_PAGE_IDS", "")
@@ -63,8 +65,16 @@ class NotionReader(BaseReader):
 
     def _block_to_text(self, block: dict) -> str:
         t = block["type"]
-        text_types = {"paragraph", "heading_1", "heading_2", "heading_3",
-                      "bulleted_list_item", "numbered_list_item", "quote", "callout"}
+        text_types = {
+            "paragraph",
+            "heading_1",
+            "heading_2",
+            "heading_3",
+            "bulleted_list_item",
+            "numbered_list_item",
+            "quote",
+            "callout",
+        }
         if t in text_types:
             return "".join(rt["plain_text"] for rt in block[t].get("rich_text", []))
         if t == "code":

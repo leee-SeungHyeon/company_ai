@@ -35,9 +35,10 @@ START → llm_node → (tool_calls?) → execute_tool_node → llm_node → END
 3. `src/ingest/upload.py` 의 `--source` argparse 옵션 추가.
 
 ## Auth Flow
-`src/api/auth.py`: `Authorization: Bearer <api-key>` → `API_KEYS` 조회 → `user_roles` 반환. 매핑 없으면 403.
+`src/api/auth.py:get_user_roles`: `Authorization: Bearer <api-key>` → `API_KEYS` 조회 → `roles` 반환. 매핑 없으면 401.
 
 ## Important Rules
 - 환경변수는 반드시 `from config import ...` (직접 `os.getenv` 금지).
-- LLM/임베딩 인스턴스는 `agent/llm.py` 의 `get_llm()` / `get_embeddings()` 사용.
-- ACL 핵심 함수(`agent/tools/base.py:build_filter`, `api/auth.py:get_current_user`, `config.py:API_KEYS`) 는 변경 금지. 상세는 `@.claude/rules/acl.md`.
+- LLM/임베딩 인스턴스는 `agent/llm.py` 의 `get_llm()` / `get_embedding_model()` 사용.
+- ACL 핵심(`agent/tools/base.py:VectorSearchTool._arun` 안 query_filter, `api/auth.py:get_user_roles`, `config.py:API_KEYS`) 변경 금지. 상세는 `@.claude/rules/acl.md`.
+- ACL 회귀 테스트: `uv run pytest tests/test_acl.py`.

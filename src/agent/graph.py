@@ -18,15 +18,18 @@ def create_agent(tools: list):
     async def llm_node(state, config):
         max_count = config["configurable"].get("max_execute_tool_count", 3)
         prompt = ChatPromptTemplate.from_messages(
-            [SystemMessage(content=QA_SYSTEM_PROMPT.format(max_execute_tool_count=max_count))]
-            + state.messages
+            [SystemMessage(content=QA_SYSTEM_PROMPT.format(max_execute_tool_count=max_count))] + state.messages
         )
         response = await (prompt | llm_with_tools).ainvoke({})
 
         if response.tool_calls:
             if state.execute_tool_count >= max_count:
                 return Command(
-                    update={"messages": [AIMessage(content="검색 횟수 한도에 도달했습니다. 현재까지의 정보로 답변드리겠습니다.")]},
+                    update={
+                        "messages": [
+                            AIMessage(content="검색 횟수 한도에 도달했습니다. 현재까지의 정보로 답변드리겠습니다.")
+                        ]
+                    },
                     goto=END,
                 )
             return Command(update={"messages": [response]}, goto="execute_tool")

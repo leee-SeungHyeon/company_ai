@@ -30,7 +30,9 @@ class VectorSearchTool(BaseTool):
     dense_vector_size: int
     collection_name: str
 
-    def __init__(self, qdrant_url: str, dense_model_name: str, sparse_model_name: str, collection_name: str = "internal_docs"):
+    def __init__(
+        self, qdrant_url: str, dense_model_name: str, sparse_model_name: str, collection_name: str = "internal_docs"
+    ):
         dense_model = get_embedding_model()
         sparse_model = SparseTextEmbedding(model_name=sparse_model_name)
         vector_size = len(dense_model.embed_query("test"))
@@ -42,11 +44,15 @@ class VectorSearchTool(BaseTool):
             collection_name=collection_name,
         )
 
-    async def upload_documents(self, documents: list[dict], vector_field: str = "content", create_collection: bool = False):
+    async def upload_documents(
+        self, documents: list[dict], vector_field: str = "content", create_collection: bool = False
+    ):
         if create_collection:
             await self.vectorstore.recreate_collection(
                 collection_name=self.collection_name,
-                vectors_config={"dense": models.VectorParams(size=self.dense_vector_size, distance=models.Distance.COSINE)},
+                vectors_config={
+                    "dense": models.VectorParams(size=self.dense_vector_size, distance=models.Distance.COSINE)
+                },
                 sparse_vectors_config={"sparse": models.SparseVectorParams(modifier=models.Modifier.IDF)},
             )
 
@@ -111,6 +117,6 @@ class VectorSearchTool(BaseTool):
         logger.info(f"임베딩 생성 중... (총 {len(texts)}개, {total_batches}개 배치)")
         vectors = []
         for i in tqdm(range(0, len(texts), batch_size), desc="임베딩", total=total_batches, unit="batch"):
-            vectors.extend(self.dense_model.embed_documents(texts[i:i + batch_size]))
+            vectors.extend(self.dense_model.embed_documents(texts[i : i + batch_size]))
         logger.info(f"임베딩 완료: {len(vectors)}개 벡터 생성")
         return vectors

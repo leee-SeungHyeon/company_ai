@@ -5,7 +5,14 @@ from .base import BaseReader
 
 
 class ConfluenceReader(BaseReader):
-    def __init__(self, url: str = None, username: str = None, api_token: str = None, space_key: str = None, allowed_roles: list[str] = None):
+    def __init__(
+        self,
+        url: str = None,
+        username: str = None,
+        api_token: str = None,
+        space_key: str = None,
+        allowed_roles: list[str] = None,
+    ):
         self.confluence = Confluence(
             url=url or os.getenv("CONFLUENCE_URL"),
             username=username or os.getenv("CONFLUENCE_USERNAME"),
