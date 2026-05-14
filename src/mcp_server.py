@@ -7,8 +7,8 @@ from starlette.responses import Response
 from agent.tools.doc_search import InternalDocSearchTool
 from config import API_KEYS, DENSE_MODEL, QDRANT_URL, SPARSE_MODEL
 
-# 요청별 user_roles를 저장하는 컨텍스트 변수
-_user_roles: contextvars.ContextVar[list[str]] = contextvars.ContextVar("user_roles", default=["all"])
+# 요청별 user_roles를 저장하는 컨텍스트 변수 (AuthMiddleware 가 매 요청마다 set)
+_user_roles: contextvars.ContextVar[list[str]] = contextvars.ContextVar("user_roles")
 
 
 class AuthMiddleware(BaseHTTPMiddleware):

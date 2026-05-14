@@ -67,7 +67,9 @@ class VectorSearchTool(BaseTool):
                 vector={"dense": dense_vector, "sparse": sparse_vector.as_object()},
                 payload=dict(doc),
             )
-            for idx, (dense_vector, sparse_vector, doc) in enumerate(zip(dense_vectors, sparse_vectors, documents))
+            for idx, (dense_vector, sparse_vector, doc) in enumerate(
+                zip(dense_vectors, sparse_vectors, documents, strict=True)
+            )
         ]
 
         await self.vectorstore.upsert(collection_name=self.collection_name, points=points)

@@ -52,7 +52,7 @@ def create_agent(tools: list):
                 content=json.dumps(result, indent=2, ensure_ascii=False),
                 tool_call_id=tool_call["id"],
             )
-            for (tool_call, _), result in zip(tasks, results)
+            for (tool_call, _), result in zip(tasks, results, strict=True)
         ]
 
         return Command(

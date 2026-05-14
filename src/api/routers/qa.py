@@ -22,7 +22,7 @@ async def qa_endpoint(request: QARequest, user_roles: list[str] = Depends(get_us
         answer = await answer_question(request.query, user_roles=user_roles)
         return QAResponse(answer=answer)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.post("/qa/stream")
