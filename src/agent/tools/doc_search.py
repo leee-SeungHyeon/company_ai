@@ -1,5 +1,5 @@
-from typing import Type
 from pydantic import BaseModel, Field
+
 from .base import VectorSearchInput, VectorSearchTool
 
 
@@ -13,7 +13,7 @@ class InternalDocSearchTool(VectorSearchTool):
         "사내 문서(규정, 가이드, 프로세스 등)를 검색하는 도구입니다. "
         "업무 규정, 사규, 프로세스 등 사내 정보를 찾을 때 사용하세요."
     )
-    args_schema: Type[BaseModel] = InternalDocSearchInput
+    args_schema: type[BaseModel] = InternalDocSearchInput
 
     def __init__(self, *args, **kwargs):
         super().__init__(collection_name="internal_docs", **kwargs)

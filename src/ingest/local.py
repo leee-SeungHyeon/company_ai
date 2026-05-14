@@ -1,5 +1,5 @@
-import io
 from pathlib import Path
+
 from .base import BaseReader
 
 SUPPORTED = {".txt", ".md", ".pdf", ".docx"}

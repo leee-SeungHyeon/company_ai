@@ -1,6 +1,8 @@
 import os
+
 from atlassian import Confluence
 from bs4 import BeautifulSoup
+
 from .base import BaseReader
 
 

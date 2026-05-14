@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+
 from api.auth import get_user_roles
 from services.qa import answer_question, stream_answer
 

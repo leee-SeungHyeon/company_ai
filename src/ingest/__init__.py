@@ -1,4 +1,4 @@
 from .base import BaseReader
-from .notion import NotionReader
 from .confluence import ConfluenceReader
+from .notion import NotionReader
 from .onedrive import OneDriveReader

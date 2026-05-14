@@ -1,7 +1,9 @@
 import io
 import os
-import requests
+
 import msal
+import requests
+
 from .base import BaseReader
 
 GRAPH_URL = "https://graph.microsoft.com/v1.0"

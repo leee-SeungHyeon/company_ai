@@ -1,14 +1,15 @@
-import logging
 import asyncio
-from typing import Type, Optional
-from langchain_core.tools import BaseTool
+import logging
+
+from fastembed import SparseTextEmbedding
 from langchain_core.callbacks import AsyncCallbackManagerForToolRun, CallbackManagerForToolRun
 from langchain_core.runnables import RunnableConfig
+from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 from qdrant_client import AsyncQdrantClient, models
-from fastembed import SparseTextEmbedding
-from agent.llm import get_embedding_model
 from tqdm import tqdm
+
+from agent.llm import get_embedding_model
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ class VectorSearchInput(BaseModel):
 class VectorSearchTool(BaseTool):
     name: str = "vector_search"
     description: str = "문서를 검색하는 도구입니다."
-    args_schema: Type[BaseModel] = VectorSearchInput
+    args_schema: type[BaseModel] = VectorSearchInput
     return_direct: bool = False
 
     vectorstore: object
@@ -71,15 +72,15 @@ class VectorSearchTool(BaseTool):
 
         await self.vectorstore.upsert(collection_name=self.collection_name, points=points)
 
-    def _run(self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None):
+    def _run(self, query: str, run_manager: CallbackManagerForToolRun | None = None):
         return asyncio.run(self._arun(query))
 
     async def _arun(
         self,
         query: str,
         top_k: int = 5,
-        config: Optional[RunnableConfig] = None,
-        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+        config: RunnableConfig | None = None,
+        run_manager: AsyncCallbackManagerForToolRun | None = None,
     ):
         user_roles = (config or {}).get("configurable", {}).get("user_roles", ["all"])
 

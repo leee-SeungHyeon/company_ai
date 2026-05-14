@@ -7,8 +7,8 @@
     python src/ingest/upload.py --source onedrive
 """
 
-import asyncio
 import argparse
+import asyncio
 import logging
 import os
 import sys
@@ -16,13 +16,14 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from dotenv import load_dotenv
-from chunker.token import TokenSizeChunker
+
 from agent.tools.doc_search import InternalDocSearchTool
-from ingest.notion import NotionReader
+from chunker.token import TokenSizeChunker
+from config import DENSE_MODEL, QDRANT_URL, SPARSE_MODEL
 from ingest.confluence import ConfluenceReader
-from ingest.onedrive import OneDriveReader
 from ingest.local import LocalReader
-from config import QDRANT_URL, DENSE_MODEL, SPARSE_MODEL
+from ingest.notion import NotionReader
+from ingest.onedrive import OneDriveReader
 
 load_dotenv(override=True)
 logging.basicConfig(level=logging.INFO)
